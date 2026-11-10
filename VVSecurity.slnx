@@ -6,4 +6,8 @@
     <Project Path="src/Backend/VVSecurity.Domain/VVSecurity.Domain.csproj" Id="ea6a38b3-f61e-419d-802a-da383783c7bc" />
     <Project Path="src/Backend/VVSecurity.Infrastructure/VVSecurity.Infrastructure.csproj" Id="f68d6efd-b258-4e2f-9604-cd626b33e107" />
   </Folder>
+  <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/VVSecurity.Communication/VVSecurity.Communication.csproj" Id="2bb050e3-b5ba-4bd2-90fc-6b6c5757df89" />
+    <Project Path="src/Shared/VVSecurity.Exceptions/VVSecurity.Exceptions.csproj" Id="9965b485-a5c2-46f8-b591-345eb11c1f39" />
+  </Folder>
 </Solution>
