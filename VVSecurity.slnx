@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Backend/">
+    <Project Path="src/Backend/VVSecurity.Api/VVSecurity.Api.csproj" Id="bbaebc63-234e-4a0b-ab13-9f04d9bedf88" />
+    <Project Path="src/Backend/VVSecurity.Application/VVSecurity.Application.csproj" Id="698ba1c2-74c4-4f73-8650-bb7819e6c21b" />
+    <Project Path="src/Backend/VVSecurity.Domain/VVSecurity.Domain.csproj" Id="ea6a38b3-f61e-419d-802a-da383783c7bc" />
+    <Project Path="src/Backend/VVSecurity.Infrastructure/VVSecurity.Infrastructure.csproj" Id="f68d6efd-b258-4e2f-9604-cd626b33e107" />
+  </Folder>
+</Solution>
