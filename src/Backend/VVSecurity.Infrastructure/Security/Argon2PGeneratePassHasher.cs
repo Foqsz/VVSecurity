@@ -5,7 +5,7 @@ using VVSecurity.Domain.Repositories;
 
 namespace VVSecurity.Infrastructure.Repository;
 
-internal sealed class Argon2PGeneratePassHasher : IGenerateSecurityPassHasher
+internal sealed class Argon2PGeneratePassHasher : IGenerateSecurityPassSecurity
 {
     private const int DEGREE_OF_PARALLELISM = 1;
     private const int ITERATIONS = 2;
@@ -17,21 +17,24 @@ internal sealed class Argon2PGeneratePassHasher : IGenerateSecurityPassHasher
     {
         var salt = RandomNumberGenerator.GetBytes(SALT_SIZE);
 
-        var hash = HashPassword(pass.ToString(), salt);
+        var hash = HashPass(pass.ToString(), salt);
 
         var combinedBytes = new byte[hash.Length + salt.Length];
 
         salt.CopyTo(combinedBytes);
         hash.CopyTo(combinedBytes, index: salt.Length);
 
-        return Convert.ToBase64String(combinedBytes);
+        return Convert.ToBase64String(combinedBytes)
+            .TrimEnd('=')
+            .Replace('+', '-')
+            .Replace('/', '_');
     }
 
-    private byte[] HashPassword(string password, byte[] salt)
+    private byte[] HashPass(string pass, byte[] salt)
     {
-        var passwordBytes = Encoding.UTF8.GetBytes(password);
+        var passBytes = Encoding.UTF8.GetBytes(pass);
 
-        var hashAlgorithm = new Argon2id(passwordBytes)
+        var hashAlgorithm = new Argon2id(passBytes)
         {
             DegreeOfParallelism = DEGREE_OF_PARALLELISM,
             Iterations = ITERATIONS,
