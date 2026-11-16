@@ -1,0 +1,184 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@inject SecurityPassClient SecurityPassClient
+@inject IJSRuntime JSRuntime
+
+<PageTitle>@(_isPortuguese ? "Gerar chave de segurança | VV Security" : "Generate a security key | VV Security")</PageTitle>
+
+<main class="generator-shell">
+    <header class="topbar">
+        <a class="brand" href="/" aria-label="VV Security">
+            <span class="brand-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M12 3.25 19 6v5.36c0 4.52-2.85 7.83-7 9.39-4.15-1.56-7-4.87-7-9.39V6l7-2.75Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+                    <path d="m9 12.1 2.05 2.05L15.5 9.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </span>
+            <span>VV<span class="brand-light">SECURITY</span></span>
+        </a>
+        <div class="topbar-actions">
+            <div class="language-switch" role="group" aria-label="@(_isPortuguese ? "Idioma" : "Language")">
+                <button class="@(_isPortuguese ? "language-option selected" : "language-option")" type="button" @onclick="() => SetLanguageAsync(true)" aria-pressed="@_isPortuguese">PT-BR</button>
+                <button class="@(!_isPortuguese ? "language-option selected" : "language-option")" type="button" @onclick="() => SetLanguageAsync(false)" aria-pressed="@(!_isPortuguese)">English</button>
+            </div>
+            <button class="theme-toggle" type="button" @onclick="ToggleDarkModeAsync" aria-label="@(_isDarkMode ? (_isPortuguese ? "Ativar modo claro" : "Enable light mode") : (_isPortuguese ? "Ativar modo escuro" : "Enable dark mode"))" aria-pressed="@_isDarkMode" title="@(_isDarkMode ? (_isPortuguese ? "Ativar modo claro" : "Enable light mode") : (_isPortuguese ? "Ativar modo escuro" : "Enable dark mode"))">
+                @if (_isDarkMode)
+                {
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <circle cx="12" cy="12" r="3.8" stroke="currentColor" stroke-width="1.7" />
+                        <path d="M12 2.5v2m0 15v2m9.5-9.5h-2m-15 0h-2m16.22-6.72-1.42 1.42M6.7 17.3l-1.42 1.42m13.44 0-1.42-1.42M6.7 6.7 5.28 5.28" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+                    </svg>
+                    <span>@(_isPortuguese ? "Claro" : "Light")</span>
+                }
+                else
+                {
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M20.2 15.1A8.5 8.5 0 0 1 8.9 3.8 8.5 8.5 0 1 0 20.2 15.1Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+                    </svg>
+                    <span>@(_isPortuguese ? "Escuro" : "Dark")</span>
+                }
+            </button>
+            <span class="secure-label"><span class="status-dot"></span> @(_isPortuguese ? "Gerador de chave seguro" : "Secure key generator")</span>
+        </div>
+    </header>
+
+    <section class="hero" aria-labelledby="page-title">
+        <p class="eyebrow">@(_isPortuguese ? "Mais segurança começa aqui" : "A stronger start")</p>
+        <h1 id="page-title">@(_isPortuguese ? "Sua chave de segurança," : "Your security key,")<br /><span>@(_isPortuguese ? "pronta em instantes." : "ready in a moment.")</span></h1>
+        <p class="hero-copy">@(_isPortuguese ? "Crie uma chave de segurança exclusiva para sua conta. Guarde-a em um local seguro e privado." : "Create a unique security key for your account. Keep it somewhere safe and private.")</p>
+
+        <div class="generator-card">
+            <div class="card-heading">
+                <span class="card-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M7.75 10V7.75a4.25 4.25 0 0 1 8.5 0V10m-9.5 0h10.5c.69 0 1.25.56 1.25 1.25v7c0 .69-.56 1.25-1.25 1.25H6.75c-.69 0-1.25-.56-1.25-1.25v-7c0-.69.56-1.25 1.25-1.25Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M12 14v2.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+                    </svg>
+                </span>
+                <div>
+                    <h2>@(_isPortuguese ? "Gere sua chave" : "Generate your key")</h2>
+                    <p>@(_isPortuguese ? "Uma chave nova e exclusiva é gerada a cada solicitação." : "A new, unique key is generated every time.")</p>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(_securityToken))
+            {
+                <div class="result-block">
+                    <label for="security-key">@(_isPortuguese ? "Sua chave de segurança" : "Your security key")</label>
+                    <div class="key-field">
+                        <code id="security-key">@_securityToken</code>
+                        <button class="copy-button" type="button" @onclick="CopyKeyAsync" aria-label="@(_isPortuguese ? "Copiar chave de segurança" : "Copy security key")">
+                            @if (_copied)
+                            {
+                                <span>@(_isPortuguese ? "Copiada" : "Copied")</span>
+                            }
+                            else
+                            {
+                                <span>@(_isPortuguese ? "Copiar" : "Copy")</span>
+                            }
+                        </button>
+                    </div>
+                    <p class="key-hint">@(_isPortuguese ? "Trate esta chave como uma senha. Ela não poderá ser recuperada depois." : "Treat this key like a password. It cannot be recovered later.")</p>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(_errorMessage))
+            {
+                <p class="error-message" role="alert">@_errorMessage</p>
+            }
+
+            <button class="generate-button" type="button" @onclick="GenerateKeyAsync" disabled="@_isGenerating">
+                @if (_isGenerating)
+                {
+                    <span class="spinner" aria-hidden="true"></span>
+                    <span>@(_isPortuguese ? "Gerando sua chave..." : "Generating your key...")</span>
+                }
+                else
+                {
+                    <span>@(_isPortuguese ? "Gerar chave de segurança" : "Generate security key")</span>
+                    <span class="button-arrow" aria-hidden="true">→</span>
+                }
+            </button>
+
+            <div class="privacy-note">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path d="M10 2.5 16 5v4.6c0 3.88-2.44 6.71-6 8.04-3.56-1.33-6-4.16-6-8.04V5l6-2.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" />
+                    <path d="m7.6 9.9 1.6 1.6 3.3-3.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span>@(_isPortuguese ? "Sua chave é gerada com segurança pela VV Security." : "Your key is generated securely by VV Security.")</span>
+            </div>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <span>VV Security</span>
+        <span>@(_isPortuguese ? "Proteja o que importa." : "Protect what matters.")</span>
+    </footer>
+</main>
+
+@code {
+    private string? _securityToken;
+    private string? _errorMessage;
+    private bool _isGenerating;
+    private bool _copied;
+    private bool _isPortuguese = true;
+    private bool _isDarkMode;
+
+    private async Task ToggleDarkModeAsync()
+    {
+        _isDarkMode = !_isDarkMode;
+        await JSRuntime.InvokeVoidAsync("vvSecurity.setDarkMode", _isDarkMode);
+    }
+
+    private async Task SetLanguageAsync(bool isPortuguese)
+    {
+        _isPortuguese = isPortuguese;
+        await JSRuntime.InvokeVoidAsync("vvSecurity.setLanguage", isPortuguese ? "pt-BR" : "en");
+    }
+
+    private async Task GenerateKeyAsync()
+    {
+        _isGenerating = true;
+        _errorMessage = null;
+        _securityToken = null;
+        _copied = false;
+
+        try
+        {
+            _securityToken = await SecurityPassClient.GenerateAsync();
+        }
+        catch (HttpRequestException)
+        {
+            _errorMessage = _isPortuguese
+                ? "Não foi possível conectar ao serviço de chaves. Tente novamente em instantes."
+                : "We couldn't connect to the key service. Please try again in a moment.";
+        }
+        catch (TaskCanceledException)
+        {
+            _errorMessage = _isPortuguese
+                ? "A solicitação demorou demais. Tente novamente."
+                : "The request took too long. Please try again.";
+        }
+        catch (InvalidOperationException)
+        {
+            _errorMessage = _isPortuguese
+                ? "O serviço de chaves retornou uma resposta inválida. Tente novamente."
+                : "The key service returned an invalid response. Please try again.";
+        }
+        finally
+        {
+            _isGenerating = false;
+        }
+    }
+
+    private async Task CopyKeyAsync()
+    {
+        if (string.IsNullOrEmpty(_securityToken))
+        {
+            return;
+        }
+
+        await JSRuntime.InvokeVoidAsync("vvSecurity.copyText", _securityToken);
+        _copied = true;
+    }
+}
