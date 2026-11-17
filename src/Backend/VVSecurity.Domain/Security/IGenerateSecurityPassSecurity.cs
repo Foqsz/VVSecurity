@@ -2,5 +2,5 @@
 
 public interface IGenerateSecurityPassSecurity
 {
-    string GenerateSecurityPass(Guid pass);
+    string GenerateSecurityPass();
 }
