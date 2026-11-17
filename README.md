@@ -2,8 +2,6 @@
 
 **VVSecurity** é um projeto de API desenvolvido em **C# e ASP.NET Core (.NET 10)**, com foco na geração de chaves de segurança criptograficamente seguras. A proposta é oferecer uma base organizada para a emissão de tokens e chaves aleatórias utilizados por sistemas e integrações.
 
-> **Status:** em desenvolvimento. O repositório público ainda contém a estrutura inicial da API; a geração de chaves descrita abaixo corresponde à implementação CSPRNG em desenvolvimento e pode não estar disponível na branch principal.
-
 ## Objetivo
 
 Gerar chaves secretas com alta entropia, sem depender de identificadores previsíveis ou de algoritmos de hash de senhas. A geração utiliza o gerador de números aleatórios criptograficamente seguro disponibilizado pelo .NET.
@@ -17,7 +15,7 @@ using System.Security.Cryptography;
 
 public static string GenerateSecurityKey()
 {
-    byte[] key = RandomNumberGenerator.GetBytes(32);
+    var key = RandomNumberGenerator.GetBytes(32);
 
     return Convert.ToBase64String(key)
         .TrimEnd('=')
@@ -53,7 +51,7 @@ O exemplo demonstra o **formato do payload** e não estabelece uma rota de API: 
 - **.NET 10** — framework de execução.
 - **ASP.NET Core Web API** — infraestrutura HTTP.
 - **System.Security.Cryptography** — geração de bytes criptograficamente aleatórios.
-- **OpenAPI** — documentação de API habilitada no ambiente de desenvolvimento.
+- **Swagger** — documentação de API habilitada no ambiente de desenvolvimento.
 
 ## Estrutura do projeto
 
@@ -111,16 +109,6 @@ dotnet run --project src/Backend/VVSecurity.Api/VVSecurity.Api.csproj
 
 A aplicação exibirá no terminal os endereços HTTP/HTTPS configurados para o ambiente local.
 
-### OpenAPI
-
-Na configuração atualmente publicada, o documento OpenAPI é disponibilizado **somente em ambiente de desenvolvimento**. Com a API em execução, consulte:
-
-```text
-<URL_BASE_DA_API>/openapi/v1.json
-```
-
-O projeto disponibiliza a definição OpenAPI; uma interface Swagger UI não está configurada na versão pública consultada.
-
 ## Boas práticas de segurança
 
 - Gere sempre as chaves com um gerador criptograficamente seguro, como `RandomNumberGenerator`.
@@ -129,14 +117,6 @@ O projeto disponibiliza a definição OpenAPI; uma interface Swagger UI não est
 - Se a chave funcionar como **token de autenticação**, considere armazenar somente seu hash (por exemplo, SHA-256) e comparar o hash da chave recebida.
 - Se a chave for utilizada para **criptografia ou HMAC**, preserve o segredo de forma segura, pois o hash não substitui a chave original para esses usos.
 - Defina validade, revogação, rotação e limitação de tentativas conforme o contexto de uso.
-
-## Próximos passos
-
-- [ ] Integrar e disponibilizar a geração de chaves na API pública.
-- [ ] Documentar as rotas e os exemplos de requisição e resposta.
-- [ ] Adicionar testes automatizados para formato, tamanho e comportamento do gerador.
-- [ ] Definir políticas de armazenamento, expiração e revogação, conforme o uso da chave.
-- [ ] Adicionar observabilidade e tratamento padronizado de erros.
 
 ## Autor
 
