@@ -16,7 +16,7 @@ public static class DependencyInjectionExtension
 
         private void AddSecurity(IConfiguration configuration)
         {
-            services.AddScoped<IGenerateSecurityPassSecurity, Argon2PGeneratePassHasher>();
+            services.AddScoped<IGenerateSecurityPassSecurity, GenerateSecurityKey>();
         }
     }
 

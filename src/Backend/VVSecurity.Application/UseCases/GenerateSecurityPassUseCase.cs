@@ -14,9 +14,7 @@ public class GenerateSecurityPassUseCase : IGenerateSecurityPassUseCase
 
     public Task<ResponseSecurityPassJson> Execute()
     {
-        var securityPass = Guid.CreateVersion7();
-
-        var generateHasher = _generateSecurityPassSecurity.GenerateSecurityPass(securityPass);
+        var generateHasher = _generateSecurityPassSecurity.GenerateSecurityPass();
 
         var response = new ResponseSecurityPassJson
         {
