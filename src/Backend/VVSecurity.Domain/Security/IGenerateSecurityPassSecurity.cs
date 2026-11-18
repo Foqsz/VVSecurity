@@ -1,6 +1,8 @@
-﻿namespace VVSecurity.Domain.Repositories;
+﻿using VVSecurity.Communication.Request;
+
+namespace VVSecurity.Domain.Repositories;
 
 public interface IGenerateSecurityPassSecurity
 {
-    string GenerateSecurityPass();
+    string GenerateSecurityPass(GenerateSecurityPassRequest generateSecurityPassRequest);
 }
