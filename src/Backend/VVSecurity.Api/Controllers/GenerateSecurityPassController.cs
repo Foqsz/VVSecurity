@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VVSecurity.Application.UseCases;
+using VVSecurity.Communication.Request;
+using VVSecurity.Exceptions;
 
 namespace VVSecurity.Api.Controllers
 {
@@ -7,13 +9,14 @@ namespace VVSecurity.Api.Controllers
     [ApiController]
     public class GenerateSecurityPassController : ControllerBase
     {
-        [HttpGet("generateSecurityPass")]
+        [HttpPost("generateSecurityPass")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorOnValidationException), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Generate(
-            [FromServices] IGenerateSecurityPassUseCase useCase)
+            [FromServices] IGenerateSecurityPassUseCase useCase,
+            [FromBody] GenerateSecurityPassRequest request)
         {
-            var response = await useCase.Execute();
+            var response = await useCase.Execute(request);
 
             return Ok(response);
         }
