@@ -1,3 +1,4 @@
+using VVSecurity.Api;
 using VVSecurity.Application;
 using VVSecurity.Infrastructure;
 
@@ -11,6 +12,11 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddAplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddMvc(options =>
+{
+    options.Filters.Add<ExceptionFilter>();
+});
 
 var app = builder.Build();
 
