@@ -1,18 +1,21 @@
-
+# Etapa 1: Compilar o frontend Blazor
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 WORKDIR /src
+
 COPY . .
 
-RUN dotnet publish "CAMINHO_DO_FRONTEND.csproj" -c Release -o /app/publish
+RUN dotnet publish "src/Frontend/VVSecurity.Frontend.csproj" -c Release -o /app/publish
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0
+# Etapa 2: Executar o frontend
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 
 WORKDIR /app
+
 COPY --from=build /app/publish .
 
 ENV ASPNETCORE_URLS=http://0.0.0.0:10000
 
 EXPOSE 10000
 
-ENTRYPOINT ["dotnet", "NOME_DO_FRONTEND.dll"]
+ENTRYPOINT ["dotnet", "VVSecurity.Frontend.dll"]
