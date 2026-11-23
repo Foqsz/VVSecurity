@@ -7,4 +7,8 @@
     <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\VVSecurity.Communication\VVSecurity.Communication.csproj" />
+  </ItemGroup>
+
 </Project>

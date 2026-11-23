@@ -1,16 +1,23 @@
-using System.Net.Http.Json;
+using VVSecurity.Communication.Request;
 
 namespace VVSecurity.Frontend.Services;
 
 public sealed class SecurityPassClient(HttpClient httpClient)
 {
-    public async Task<string> GenerateAsync(CancellationToken cancellationToken = default)
+    public async Task<string> GenerateAsync(
+        GenerateSecurityPassRequest request,
+        CancellationToken cancellationToken = default)
     {
-        var response = await httpClient.GetFromJsonAsync<GenerateSecurityPassResponse>(
+        using var response = await httpClient.PostAsJsonAsync(
             "GenerateSecurityPass/generateSecurityPass",
+            request,
+            cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        var result = await response.Content.ReadFromJsonAsync<GenerateSecurityPassResponse>(
             cancellationToken);
 
-        return response?.SecurityToken
+        return result?.SecurityToken
             ?? throw new InvalidOperationException("The API returned an empty security token.");
     }
 

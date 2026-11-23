@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using VVSecurity.Communication.Request
 @rendermode InteractiveServer
 @inject SecurityPassClient SecurityPassClient
 @inject IJSRuntime JSRuntime
@@ -61,6 +62,43 @@
                 </div>
             </div>
 
+            <div class="generation-options">
+                <div class="length-control">
+                    <label for="key-length">@(_isPortuguese ? "Comprimento da chave" : "Key length")</label>
+                    <div class="length-input-wrap">
+                        <input id="key-length" type="number" min="8" max="128" @bind="_length" disabled="@_isGenerating" />
+                        <span>@(_isPortuguese ? "caracteres" : "characters")</span>
+                    </div>
+                    @if (_length is < 8 or > 128)
+                    {
+                        <p class="field-error">@(_isPortuguese ? "Escolha um valor entre 8 e 128." : "Choose a value between 8 and 128.")</p>
+                    }
+                </div>
+                <fieldset class="character-options" disabled="@_isGenerating">
+                    <legend>@(_isPortuguese ? "Tipos de caracteres" : "Character types")</legend>
+                    <label class="option-toggle">
+                        <input type="checkbox" @bind="_includeUpperCase" />
+                        <span>@(_isPortuguese ? "Letras maiúsculas (A-Z)" : "Uppercase letters (A-Z)")</span>
+                    </label>
+                    <label class="option-toggle">
+                        <input type="checkbox" @bind="_includeLowerCase" />
+                        <span>@(_isPortuguese ? "Letras minúsculas (a-z)" : "Lowercase letters (a-z)")</span>
+                    </label>
+                    <label class="option-toggle">
+                        <input type="checkbox" @bind="_includeNumbers" />
+                        <span>@(_isPortuguese ? "Números (0-9)" : "Numbers (0-9)")</span>
+                    </label>
+                    <label class="option-toggle">
+                        <input type="checkbox" @bind="_includeSymbols" />
+                        <span>@(_isPortuguese ? "Símbolos" : "Symbols")</span>
+                    </label>
+                </fieldset>
+                @if (!HasCharacterTypeSelected)
+                {
+                    <p class="field-error" role="alert">@(_isPortuguese ? "Selecione ao menos um tipo de caractere." : "Select at least one character type.")</p>
+                }
+            </div>
+
             @if (!string.IsNullOrEmpty(_securityToken))
             {
                 <div class="result-block">
@@ -87,7 +125,7 @@
                 <p class="error-message" role="alert">@_errorMessage</p>
             }
 
-            <button class="generate-button" type="button" @onclick="GenerateKeyAsync" disabled="@_isGenerating">
+            <button class="generate-button" type="button" @onclick="GenerateKeyAsync" disabled="@(_isGenerating || !IsRequestValid)">
                 @if (_isGenerating)
                 {
                     <span class="spinner" aria-hidden="true"></span>
@@ -123,6 +161,16 @@
     private bool _copied;
     private bool _isPortuguese = true;
     private bool _isDarkMode;
+    private int _length = 25;
+    private bool _includeUpperCase = true;
+    private bool _includeLowerCase = true;
+    private bool _includeNumbers = true;
+    private bool _includeSymbols = true;
+
+    private bool HasCharacterTypeSelected =>
+        _includeUpperCase || _includeLowerCase || _includeNumbers || _includeSymbols;
+
+    private bool IsRequestValid => _length is >= 8 and <= 128 && HasCharacterTypeSelected;
 
     private async Task ToggleDarkModeAsync()
     {
@@ -145,7 +193,16 @@
 
         try
         {
-            _securityToken = await SecurityPassClient.GenerateAsync();
+            var request = new GenerateSecurityPassRequest
+            {
+                Length = _length,
+                IncludeUpperCase = _includeUpperCase,
+                IncludeLowerCase = _includeLowerCase,
+                IncludeNumbers = _includeNumbers,
+                IncludeSymbols = _includeSymbols
+            };
+
+            _securityToken = await SecurityPassClient.GenerateAsync(request);
         }
         catch (HttpRequestException)
         {
